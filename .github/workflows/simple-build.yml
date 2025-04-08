@@ -1,0 +1,51 @@
+name: Simple Build and Pack
+
+on:
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Fix README path
+      run: |
+        # Create assets directory if it doesn't exist
+        mkdir -p assets
+        # Check if README.md exists in current directory
+        if [ -f "README.md" ]; then
+          echo "Found README.md in repository root"
+        else
+          echo "README.md not found, creating placeholder"
+          echo "# MyBook.Writer" > README.md
+        fi
+        # Check if icon.png exists
+        if [ ! -f "assets/icon.png" ]; then
+          echo "Creating placeholder icon"
+          mkdir -p assets
+          # Create a simple 1x1 transparent PNG
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" | base64 -d > assets/icon.png
+        fi
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build MyBook.Writer/MyBook.Writer.csproj --configuration Release --no-restore
+    
+    - name: Pack
+      run: dotnet pack MyBook.Writer/MyBook.Writer.csproj --configuration Release --no-build --output ./nupkgs
+    
+    - name: List packages
+      run: ls -la ./nupkgs
+      
+    - name: Publish to NuGet.org
+      run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json 
