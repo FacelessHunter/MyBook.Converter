@@ -1,0 +1,92 @@
+name: Build and Publish NuGet Package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Get all history for versioning
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/MyBook.Writer.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Set version from tag
+      if: github.event_name == 'release'
+      run: |
+        # Extract version from release tag (remove 'v' prefix if present)
+        VERSION=${GITHUB_REF#refs/tags/}
+        VERSION=${VERSION#v}
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        # Update project version
+        sed -i "s/<Version>.*<\/Version>/<Version>$VERSION<\/Version>/g" MyBook.Writer/MyBook.Writer.csproj
+        echo "Set version to $VERSION"
+      
+    - name: Build
+      run: dotnet build MyBook.Writer/MyBook.Writer.csproj --configuration Release --no-restore
+    
+    - name: Run tests
+      run: |
+        # Check if tests directory exists and run tests if it does
+        if [ -d "BookWriter.Tests" ]; then
+          dotnet test BookWriter.Tests/BookWriter.Tests.csproj --configuration Release --no-build --verbosity normal
+        else
+          echo "No test project found, skipping tests"
+        fi
+      
+    - name: Pack
+      run: dotnet pack MyBook.Writer/MyBook.Writer.csproj --configuration Release --no-build --output ./nupkgs
+    
+    - name: Display NuGet package details
+      run: |
+        echo "Generated NuGet packages:"
+        ls -la ./nupkgs
+    
+    - name: Publish to NuGet.org
+      if: github.event_name == 'release'
+      run: dotnet nuget push ./nupkgs/*.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
+      
+    - name: Upload NuGet package as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-packages
+        path: ./nupkgs/
+        retention-days: 7
+
+    - name: Create summary
+      run: |
+        echo "# Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## Version Information" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ github.event_name }}" == "release" ]; then
+          echo "- Version: $VERSION (from release tag)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- Version: $(grep -o '<Version>.*</Version>' MyBook.Writer/MyBook.Writer.csproj | sed 's/<Version>\(.*\)<\/Version>/\1/')" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "## Generated Packages" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        ls -la ./nupkgs >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        if [ "${{ github.event_name }}" == "release" ]; then
+          echo "✅ Package has been published to NuGet.org" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "ℹ️ This was a manual run, package was not published to NuGet.org" >> $GITHUB_STEP_SUMMARY 

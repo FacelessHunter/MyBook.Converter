@@ -2,6 +2,9 @@
 
 A clean, modern library for creating e-books in EPUB and FB2 formats using .NET.
 
+[![NuGet](https://img.shields.io/nuget/v/MyBook.Writer.svg)](https://www.nuget.org/packages/MyBook.Writer/)
+[![Build and Publish](https://github.com/YourUsername/DataScraper/actions/workflows/nuget-publish.yml/badge.svg)](https://github.com/YourUsername/DataScraper/actions/workflows/nuget-publish.yml)
+
 ## Features
 
 - Create EPUB and FB2 format e-books
@@ -11,6 +14,7 @@ A clean, modern library for creating e-books in EPUB and FB2 formats using .NET.
 - Optional file-based output
 - Factory pattern for format selection
 - Clean and simple API with a single interface
+- Integrated logging using Microsoft.Extensions.Logging
 
 ## Installation
 
@@ -115,9 +119,9 @@ The library uses a simplified interface design:
 
 This design makes it easy to use the library with a consistent API regardless of the book format you're targeting.
 
-## Logging and Diagnostics
+## Logging
 
-MyBook.Writer includes comprehensive logging and diagnostics capabilities for both EPUB and FB2 formats. The library uses Microsoft.Extensions.Logging to provide detailed information about its operations.
+MyBook.Writer includes comprehensive logging capabilities for both EPUB and FB2 formats. The library uses Microsoft.Extensions.Logging to provide detailed information about its operations.
 
 ### Setting Up Logging
 
@@ -170,50 +174,24 @@ builder.AddFilter("MyBook.Writer", LogLevel.Debug);
 builder.AddFilter("MyBook.Writer", LogLevel.Trace);
 ```
 
-### Using the Diagnostic Service
+## NuGet Package
 
-The DiagnosticService allows you to track operations and measure performance:
+MyBook.Writer is available as a NuGet package:
 
-```csharp
-// Create a diagnostic service
-var diagnostics = loggerFactory.CreateDiagnosticService();
+- [MyBook.Writer on NuGet.org](https://www.nuget.org/packages/MyBook.Writer/)
 
-// Track an operation
-diagnostics.TrackOperation("OperationName", () =>
-{
-    // Code to be tracked
-});
+To install the package, use one of the following methods:
 
-// Track an async operation
-var result = await diagnostics.TrackOperation("AsyncOperation", async () =>
-{
-    // Async code to be tracked
-    return await SomeAsyncMethod();
-});
-
-// Record a custom metric
-diagnostics.RecordMetric("CustomMetric", 42);
-
-// Get all operation durations
-foreach (var operation in diagnostics.GetOperationDurations())
-{
-    Console.WriteLine($"Operation: {operation.Key}, Duration: {operation.Value}ms");
-}
-
-// Get all metrics
-foreach (var metric in diagnostics.GetMetrics())
-{
-    Console.WriteLine($"Metric: {metric.Key}, Value: {metric.Value}");
-}
+**Package Manager Console:**
+```
+Install-Package MyBook.Writer
 ```
 
-### Complete Examples
+**.NET CLI:**
+```
+dotnet add package MyBook.Writer
+```
 
-See the example files for complete demonstrations of logging with each format:
+## Contributing
 
-- `Examples/EpubLoggingExample.cs` - Example of EPUB format with detailed logging
-- `Examples/FB2LoggingExample.cs` - Example of FB2 format with detailed logging
-
-## License
-
-MIT 
+Contributions are welcome! Please feel free to submit a Pull Request. 

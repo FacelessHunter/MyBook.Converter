@@ -9,9 +9,19 @@
     <Authors>MyBook Team</Authors>
     <Company>MyBook</Company>
     <Product>MyBook Writer Library</Product>
-    <Description>A library for creating e-books in EPUB and FB2 formats</Description>
-    <PackageTags>ebook;epub;fb2;writer</PackageTags>
+    <Description>A library for creating e-books in EPUB and FB2 formats with support for rich formatting, table of contents, and metadata.</Description>
+    <PackageTags>ebook;epub;fb2;writer;ereader;book;publishing</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/FacelessHunter/MyBook.Converter</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FacelessHunter/MyBook.Converter</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +29,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/"/>
+    <None Include="../assets/icon.png" Pack="true" PackagePath="/"/>
   </ItemGroup>
 
 </Project>
