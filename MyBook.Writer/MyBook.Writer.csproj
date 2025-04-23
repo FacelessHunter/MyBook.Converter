@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>MyBook.Writer</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>MyBook Team</Authors>
     <Company>MyBook</Company>
     <Product>MyBook Writer Library</Product>
@@ -32,9 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="/" Condition="Exists('README.md')">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="../README.md" Pack="true" PackagePath="/" Condition="Exists('../README.md')" />
     <None Include="$(MSBuildThisFileDirectory)../README.md" Pack="true" PackagePath="/" Condition="Exists('$(MSBuildThisFileDirectory)../README.md')" />
     <None Include="assets/icon.png" Pack="true" PackagePath="/" Condition="Exists('assets/icon.png')" />
